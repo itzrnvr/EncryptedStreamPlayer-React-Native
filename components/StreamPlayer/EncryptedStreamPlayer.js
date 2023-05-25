@@ -1,4 +1,5 @@
 import React, {useEffect, useState, useRef} from 'react';
+import {useNetInfo} from "@react-native-community/netinfo";
 
 //import all the components we are going to use
 import {
@@ -7,7 +8,8 @@ import {
   View,
   Button,
   Platform,
-  Dimensions
+  Dimensions,
+  Text
 } from 'react-native';
 
 
@@ -22,6 +24,8 @@ import HTML_FILE from '../../resources/index.html';
 const isAndroid = Platform.OS === 'android';
 
 const EncryptedStreamPlayer = (props) => {
+
+    const netInfo = useNetInfo();
     let webviewRef = useRef();
     const INJECTED_JAVASCRIPT = `(function() {
         var open = XMLHttpRequest.prototype.open;
@@ -43,7 +47,8 @@ const EncryptedStreamPlayer = (props) => {
         }
 
         useEffect(()=> {
-          if(props.videoUrl != "")
+          if(props.videoUrl != "" && netInfo.isConnected)
+      
             loadJavascript({
               event: {
                 type: "loadNewStream",
@@ -53,8 +58,8 @@ const EncryptedStreamPlayer = (props) => {
         }, [props.videoUrl])
  
 
-        if (isAndroid) {
-          return (
+        return netInfo.isConnected ? (isAndroid) ?
+          (
             <WebView
                 ref={(webView) => webviewRef = webView}
                 injectedJavaScript={INJECTED_JAVASCRIPT}
@@ -67,26 +72,34 @@ const EncryptedStreamPlayer = (props) => {
                 style={styles.player}
                 originWhitelist={['*']}
                 source={{
-                    uri: 'file:///android_asset/index.html'
+                    // uri: 'file:///android_asset/index.html'
+                    uri: "https://itzrnvr.github.io/EncryptedStreamPlayer-React-Native/"
                 }}
                 domStorageEnabled={true}
             />
-          );
-        } else {
-          return (
+          ) : (
             <WebView
-                javaScriptEnabled={true}
-                scrollEnabled={false}
-                allowsFullscreenVideo={true}
-                userAgent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 
-                (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
-                style={styles.player}
-                originWhitelist={['*']}
-                source={HTML_FILE}
-                domStorageEnabled={true}
+              ref={(webView) => webviewRef = webView}
+              injectedJavaScript={INJECTED_JAVASCRIPT}
+              onMessage={event => {
+                console.log('>>>', event);
+              }}
+              javaScriptEnabled={true}
+              scrollEnabled={false}
+              allowsFullscreenVideo={true}
+              style={styles.player}
+              originWhitelist={['*']}
+              source={{
+                  // uri: 'file:///android_asset/index.html'
+                  uri: "https://itzrnvr.github.io/EncryptedStreamPlayer-React-Native/"
+              }}
+              domStorageEnabled={true}
             />
-          );
-        }
+          ) 
+          : <View styles={styles.player}>
+              <Text styles = {{color: '#000000'}}>Please check your internet</Text>
+          </View>
+        
 };
 
 

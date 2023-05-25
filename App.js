@@ -17,7 +17,7 @@ import {
 
 const App = () => {
   const [fragmentIndex, setFragmentIndex] = useState(3);
-  const [url, setUrl] = useState("")
+  const [url, setUrl] = useState("https://firebasestorage.googleapis.com/v0/b/stream-46b9f.appspot.com/o/testvideo%2Fmanifest.m3u8?alt=media&token=9cf47cac-998e-40f6-bdfb-31bb08f371ab")
 
   let textInput = ""
 
@@ -27,7 +27,7 @@ const App = () => {
         <Text style={styles.topBarText}>Encrypted Stream</Text>
       </View>
       <View style={styles.container}>
-        <Text style={styles.inputHead}>Enter encryptedd hls URL</Text>
+        <Text style={styles.inputHead}>Enter encrypted hls URL</Text>
         <TextInput
           style={{margin: 5, height: 40, borderColor: 'gray', borderWidth: 3, color: "#000000" }}
           onChange={event => {

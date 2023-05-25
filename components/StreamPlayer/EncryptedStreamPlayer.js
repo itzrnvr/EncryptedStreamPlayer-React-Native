@@ -68,7 +68,7 @@ const EncryptedStreamPlayer = (props) => {
         }
 
       
-        return netInfo.isConnected ? (isAndroid) ?
+        return netInfo.isConnected ? ((isAndroid) ?
           (
             <WebView
                 ref={(webView) => webviewRef = webView}
@@ -119,9 +119,13 @@ const EncryptedStreamPlayer = (props) => {
               }}
               onLoadEnd={() => props.onPlayerReady(true)}
             />
-          ) 
-          : <View styles={{...styles.player, backgroundColor: "#000000"}}>
-              <Text styles = {{color: '#000000'}}>Please check your internet</Text>
+          ) )
+          : <View style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}>
+              <Text style = {{color: '#000000', fontSize: 24}}>Please check your Internet</Text>
           </View>
         
 };

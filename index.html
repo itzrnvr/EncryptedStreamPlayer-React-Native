@@ -6,7 +6,9 @@
         </script>
 	</head>
 	<body>
-		<video id="video" style="width: 100%; height: auto" controls  allowfullscreen="true"></video>
+		<video id="video" style="width: 100%; height: auto" controls  allowfullscreen="true"
+		autoplay="true"
+    muted="muted"></video>
 		<script>
 				document.addEventListener("message", handleEvent);
 				const video = document.getElementById('video');
@@ -33,6 +35,8 @@
 						default:
 					}
 				}
+
+				loadNewStreamWithUrl("https://firebasestorage.googleapis.com/v0/b/stream-46b9f.appspot.com/o/testvideo%2Fmanifest.m3u8?alt=media&token=9cf47cac-998e-40f6-bdfb-31bb08f371ab")
 				
 				
 		</script>

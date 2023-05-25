@@ -61,6 +61,7 @@ const App = () => {
           ...playerStatus,
           playerReady: status
         })} />
+   
     </SafeAreaView>
   );
 };

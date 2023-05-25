@@ -9,7 +9,8 @@ import {
   Button,
   Platform,
   Dimensions,
-  Text
+  Text,
+  ImageBackground
 } from 'react-native';
 
 
@@ -27,6 +28,8 @@ const EncryptedStreamPlayer = (props) => {
 
     const netInfo = useNetInfo();
     let webviewRef = useRef();
+    const isReady = useRef(false)
+  
     const INJECTED_JAVASCRIPT = `(function() {
         var open = XMLHttpRequest.prototype.open;
         XMLHttpRequest.prototype.open = function() {
@@ -46,18 +49,25 @@ const EncryptedStreamPlayer = (props) => {
            })); })();` );
         }
 
-        useEffect(()=> {
-          if(props.videoUrl != "" && netInfo.isConnected)
-      
+        const loadNewVideo = (url)=> {
+          if(url != "" && isReady && netInfo.isConnected)
             loadJavascript({
               event: {
                 type: "loadNewStream",
-                url: props.videoUrl
+                url: url
               }
-            })
+            })          
+        }
+
+        useEffect(()=> {
+          loadNewVideo(props.videoUrl)
         }, [props.videoUrl])
  
+        if(!netInfo.isConnected){
+          isReady.current = false
+        }
 
+      
         return netInfo.isConnected ? (isAndroid) ?
           (
             <WebView
@@ -76,6 +86,16 @@ const EncryptedStreamPlayer = (props) => {
                     uri: "https://itzrnvr.github.io/EncryptedStreamPlayer-React-Native/"
                 }}
                 domStorageEnabled={true}
+                onLoadStart={()=> {
+                  props.onPlayerReady(false)
+                }}
+                onLoadEnd={() => {
+                  props.onPlayerReady(true)
+                  if(!isReady.current) {
+                    isReady.current = true
+                    loadNewVideo(props.videoUrl)
+                  }
+                }}
             />
           ) : (
             <WebView
@@ -94,9 +114,13 @@ const EncryptedStreamPlayer = (props) => {
                   uri: "https://itzrnvr.github.io/EncryptedStreamPlayer-React-Native/"
               }}
               domStorageEnabled={true}
+              onLoadStart={()=> {
+                props.onPlayerReady(false)
+              }}
+              onLoadEnd={() => props.onPlayerReady(true)}
             />
           ) 
-          : <View styles={styles.player}>
+          : <View styles={{...styles.player, backgroundColor: "#000000"}}>
               <Text styles = {{color: '#000000'}}>Please check your internet</Text>
           </View>
         

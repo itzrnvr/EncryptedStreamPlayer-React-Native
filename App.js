@@ -12,12 +12,16 @@ import {
   Button,
   Platform,
   Text,
-  TextInput
+  TextInput,
+  ActivityIndicator
 } from 'react-native';
 
 const App = () => {
   const [fragmentIndex, setFragmentIndex] = useState(3);
   const [url, setUrl] = useState("https://firebasestorage.googleapis.com/v0/b/stream-46b9f.appspot.com/o/testvideo%2Fmanifest.m3u8?alt=media&token=9cf47cac-998e-40f6-bdfb-31bb08f371ab")
+  const [playerStatus, setPlayerStatus] = useState({
+    playerReady: false
+  })
 
   let textInput = ""
 
@@ -44,7 +48,19 @@ const App = () => {
           onPress={()=> (textInput.includes("m3u8") || textInput == "") ? setUrl(textInput) : setUrl("Invalid HLS Stream")}
         />
       </View>
-      <EncryptedStreamPlayer index={fragmentIndex} videoUrl={url} />
+      {playerStatus.playerReady ? (
+        	<View></View>
+        ) : <View style={{ flex: 1, justifyContent: "center"}}>
+                <ActivityIndicator size="large" color="#00ff00" />
+            </View>
+      }
+      <EncryptedStreamPlayer 
+        index={fragmentIndex} 
+        videoUrl={url} 
+        onPlayerReady={(status)=> setPlayerStatus({
+          ...playerStatus,
+          playerReady: status
+        })} />
     </SafeAreaView>
   );
 };

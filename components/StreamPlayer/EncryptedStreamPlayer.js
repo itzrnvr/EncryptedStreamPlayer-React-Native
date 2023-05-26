@@ -29,16 +29,13 @@ const EncryptedStreamPlayer = (props) => {
     const netInfo = useNetInfo();
     let webviewRef = useRef();
     const isReady = useRef(false)
+
+    const androidListener = `document.addEventListener("message", handleEvent)`
+    const iosListener = `	window.addEventListener("message", handleEvent)`
   
     const INJECTED_JAVASCRIPT = `(function() {
-        var open = XMLHttpRequest.prototype.open;
-        XMLHttpRequest.prototype.open = function() {
-            this.addEventListener("load", function() {
-                var message = {"status" : this.status, "response" : this.response}
-                window.ReactNativeWebView.postMessage(JSON.stringify(message));
-            });
-            open.apply(this, arguments);
-        };})();`;
+      ${isAndroid ? androidListener : iosListener}
+    })();`;
 
         const loadJavascript = (dataObject) => {
           console.log("Called loadJavascript", dataObject)
@@ -69,7 +66,7 @@ const EncryptedStreamPlayer = (props) => {
 
         const handleWebEvents = (event) => {
           const data = JSON.parse(event.nativeEvent.data);
-          console.log(data.event.type)
+          console.log("FROM WebView", JSON.stringify(data))
         }
 
       
@@ -79,7 +76,7 @@ const EncryptedStreamPlayer = (props) => {
                 ref={(webView) => webviewRef = webView}
                 injectedJavaScript={INJECTED_JAVASCRIPT}
                 onMessage={event => {
-                  console.log('>>>', event);
+                  // console.log('>>>', event);
                   handleWebEvents(event)
                 }}
                 javaScriptEnabled={true}

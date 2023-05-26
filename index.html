@@ -18,24 +18,19 @@
 		}
 	})
 
-
-	if (navigator.appVersion.includes('Android')) {
-		document.addEventListener("message", handleEvent);
-	}
-	else {
-		window.addEventListener("message", handleEvent);
-	}
-
 	const video = document.getElementById('video');
 
 	const loadNewStream = "loadNewStream"
-	const loadStreamStarted = "loadStreamStarted"
-	const loadStreamFinished = "loadStreamFinished"
 
 
-	const sendEventToApp = (event) => {
-		window.ReactNativeWebView.postMessage(JSON.stringify(event));
+	const sendToApp = (event) => {
+		try{
+			window.ReactNativeWebView.postMessage(event.data)
+		} catch (err) {
+			console.log("Not react native")
+		}
 	}
+
 	const retry = (delay, retryCount, fn) => {
 		count = 1
 		const executor = setInterval(() => {
@@ -51,50 +46,39 @@
 		}, delay)
 	}
 
-
-	function handleStreamLoadStarted(url){
-		video.style.visibility = "hidden"
-		sendEventToApp({
+	function loadNewStreamWithUrl(url){
+		sendToApp({
 			event: {
-				type: loadStreamStarted,
+				type: "loadStreamStarted",
 				url: url
 			}
 		})
-	}
-
-	function handleStreamLoadEnded(url) {
-		video.addEventListener("loadeddata", () => {
-			if (video.readyState >= 2) {
-				console.log('visible')
-				sendEventToApp({
-					event: {
-						type: loadStreamFinished,
-						url: url
-					}
-				})
-				video.style.visibility = "visible"
-				video.play();
-			}
-		});
-		
-	}
-
-	function loadNewStreamWithUrl(url){
-		handleStreamLoadStarted(url)
-		const playStream = (url) => {
-			handleStreamLoadStarted(url)
+		video.style.visibility = "hidden"
+		const playStream = () => {
 			const hls = new Hls();
 			hls.attachMedia(video);
 			hls.on(Hls.Events.MEDIA_ATTACHED, () => {
 				hls.loadSource(url);
 			});
-			handleStreamLoadEnded(url)
+			video.play();
+			video.style.visibility = "visible"
+			sendToApp({
+					event: {
+						type: "loadStreamFinished",
+						url: url
+					}
+				})
+			if(video.playing)
+				video.muted = !video.muted;
+			
 		}
+
 		retry(1000, 100, playStream)
 	}
 
 	function handleEvent(message) {
 		console.log(message.data);
+						
 		const event = message.data.event
 		switch(event.type) {
 			case loadNewStream:

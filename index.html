@@ -46,6 +46,8 @@
 				hls.loadSource(url);
 			});
 			video.play();
+			if(video.playing)
+				video.muted = !video.muted;
 		}
 
 		retry(1000, 100, playStream)

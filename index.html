@@ -25,7 +25,7 @@
 
 	const sendToApp = (event) => {
 		try{
-			window.ReactNativeWebView.postMessage(event.data)
+			window.ReactNativeWebView.postMessage(event)
 		} catch (err) {
 			console.log("Not react native")
 		}
@@ -63,11 +63,11 @@
 			video.play();
 			video.style.visibility = "visible"
 			sendToApp({
-					event: {
-						type: "loadStreamFinished",
-						url: url
-					}
-				})
+				event: {
+					type: "loadStreamFinished",
+					url: url
+				}
+			})
 			if(video.playing)
 				video.muted = !video.muted;
 			

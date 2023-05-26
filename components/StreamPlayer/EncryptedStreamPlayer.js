@@ -65,8 +65,10 @@ const EncryptedStreamPlayer = (props) => {
         }
 
         const handleWebEvents = (event) => {
-          const data = JSON.parse(event.nativeEvent.data);
-          console.log("FROM WebView", JSON.stringify(data))
+          console.log("FROM WebView", event)
+          if(("event" in event)){
+            console.log("Event", data.event)
+          }
         }
 
       

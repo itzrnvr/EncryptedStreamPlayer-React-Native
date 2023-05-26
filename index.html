@@ -9,35 +9,62 @@
 		<video id="video" style="width: 100%; height: auto" controls  allowfullscreen="true"
 		autoplay="true"
     muted="muted"></video>
-		<script>
-				document.addEventListener("message", handleEvent);
-				const video = document.getElementById('video');
+<script>
+	Object.defineProperty(HTMLMediaElement.prototype, 'playing', {
+		get: function(){
+			return !!(this.currentTime > 0 && !this.paused && !this.ended && this.readyState > 2);
+		}
+	})
 
-				const loadNewStream = "loadNewStream"
 
-				function loadNewStreamWithUrl(url){
-					const hls = new Hls();
-					hls.attachMedia(video);
-					hls.on(Hls.Events.MEDIA_ATTACHED, () => {
-						hls.loadSource(url);
-					});
-					video.play();
-				}
+	document.addEventListener("message", handleEvent);
+	const video = document.getElementById('video');
 
-				function handleEvent(message) {
-					console.log(message.data);
-									
-					const event = message.data.event
-					switch(event.type) {
-						case loadNewStream:
-							loadNewStreamWithUrl(event.url);
-							break;
-						default:
-					}
-				}
+	const loadNewStream = "loadNewStream"
+
+
+	const retry = (delay, retryCount, fn) => {
+		count = 1
+		const executor = setInterval(() => {
+			if(count >= retryCount)
+				clearInterval(executor)
+			try{
+				fn()
+				clearInterval(executor)
+			} catch(err){
+				count++
+				console.log(err)
+			}
+		}, delay)
+	}
+
+	function loadNewStreamWithUrl(url){
+		const playStream = () => {
+			const hls = new Hls();
+			hls.attachMedia(video);
+			hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+				hls.loadSource(url);
+			});
+			video.play();
+		}
+
+		retry(1000, 100, playStream)
+	}
+
+	function handleEvent(message) {
+		console.log(message.data);
+						
+		const event = message.data.event
+		switch(event.type) {
+			case loadNewStream:
+				loadNewStreamWithUrl(event.url)
+				break;
+			default:
+		}
+	}
+
 
 		
-				
-		</script>
+</script>
 	</body>
 </html>

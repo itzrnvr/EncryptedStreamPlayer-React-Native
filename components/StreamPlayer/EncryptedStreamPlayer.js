@@ -67,6 +67,11 @@ const EncryptedStreamPlayer = (props) => {
           isReady.current = false
         }
 
+        const handleWebEvents = (event) => {
+          const data = JSON.parse(event.nativeEvent.data);
+          console.log(data.event.type)
+        }
+
       
         return netInfo.isConnected ? ((isAndroid) ?
           (
@@ -75,6 +80,7 @@ const EncryptedStreamPlayer = (props) => {
                 injectedJavaScript={INJECTED_JAVASCRIPT}
                 onMessage={event => {
                   console.log('>>>', event);
+                  handleWebEvents(event)
                 }}
                 javaScriptEnabled={true}
                 scrollEnabled={false}

@@ -8,7 +8,7 @@
         </script>
 	</head>
 	<body>
-		<video id="video" style="width: 100%; height: auto" controls  allowfullscreen="true"
+		<video id="video" style="width: 100%; height: auto; visibility: hidden;" controls  allowfullscreen="true"
 		autoplay="true"
     muted="muted"></video>
 <script>
@@ -19,12 +19,23 @@
 	})
 
 
-	document.addEventListener("message", handleEvent);
+	if (navigator.appVersion.includes('Android')) {
+		document.addEventListener("message", handleEvent);
+	}
+	else {
+		window.addEventListener("message", handleEvent);
+	}
+
 	const video = document.getElementById('video');
 
 	const loadNewStream = "loadNewStream"
+	const loadStreamStarted = "loadStreamStarted"
+	const loadStreamFinished = "loadStreamFinished"
 
 
+	const sendEventToApp = (event) => {
+		window.ReactNativeWebView.postMessage(JSON.stringify(event));
+	}
 	const retry = (delay, retryCount, fn) => {
 		count = 1
 		const executor = setInterval(() => {
@@ -40,24 +51,50 @@
 		}, delay)
 	}
 
+
+	function handleStreamLoadStarted(url){
+		video.style.visibility = "hidden"
+		sendEventToApp({
+			event: {
+				type: loadStreamStarted,
+				url: url
+			}
+		})
+	}
+
+	function handleStreamLoadEnded(url) {
+		video.addEventListener("loadeddata", () => {
+			if (video.readyState >= 2) {
+				console.log('visible')
+				sendEventToApp({
+					event: {
+						type: loadStreamFinished,
+						url: url
+					}
+				})
+				video.style.visibility = "visible"
+				video.play();
+			}
+		});
+		
+	}
+
 	function loadNewStreamWithUrl(url){
-		const playStream = () => {
+		handleStreamLoadStarted(url)
+		const playStream = (url) => {
+			handleStreamLoadStarted(url)
 			const hls = new Hls();
 			hls.attachMedia(video);
 			hls.on(Hls.Events.MEDIA_ATTACHED, () => {
 				hls.loadSource(url);
 			});
-			video.play();
-			if(video.playing)
-				video.muted = !video.muted;
+			handleStreamLoadEnded(url)
 		}
-
 		retry(1000, 100, playStream)
 	}
 
 	function handleEvent(message) {
 		console.log(message.data);
-						
 		const event = message.data.event
 		switch(event.type) {
 			case loadNewStream:

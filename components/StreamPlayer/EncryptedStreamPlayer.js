@@ -65,12 +65,7 @@ const EncryptedStreamPlayer = (props) => {
         }
 
         const handleWebEvents = (event) => {
-          console.log("FROM WebView", event.nativeEvent)
-          console.log(typeof event.nativeEvent.data)
-          {"canGoBack": false, 
-          "canGoForward": false, 
-          "data": "undefined", 
-          "loading": false, "target": 55, "title": "https://itzrnvr.github.io/EncryptedStreamPlayer-React-Native/", "url": "https://itzrnvr.github.io/EncryptedStreamPlayer-React-Native/"}
+          console.log("FROM WebView", event)
           //const data = event.data
           // if(("event" in data)){
           //   console.log("Event", data.event)

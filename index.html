@@ -26,7 +26,7 @@
 	const sendToApp = (event) => {
 		try{
 			window.ReactNativeWebView.postMessage(
-				JSON.stringify(event)
+				event
 			)
 		} catch (err) {
 			console.log("Not react native")

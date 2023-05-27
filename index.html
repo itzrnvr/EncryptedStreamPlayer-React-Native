@@ -28,7 +28,7 @@
 			window.ReactNativeWebView.postMessage(
 				JSON.stringify(event)
 			)
-			window.ReactNativeWebView.postMessage("Hello!")
+			window.ReactNativeWebView.postMessage({"message": "hello"})
 		} catch (err) {
 			console.log("Not react native")
 		}

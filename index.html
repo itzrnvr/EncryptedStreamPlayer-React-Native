@@ -79,6 +79,8 @@
 		retry(1000, 100, playStream)
 	}
 
+	loadNewStreamWithUrl('https://content.jwplatform.com/manifests/yp34SRmf.m3u8')
+
 	function handleEvent(message) {
 		console.log(message.data);
 						
